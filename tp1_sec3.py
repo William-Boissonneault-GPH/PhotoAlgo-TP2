@@ -10,7 +10,6 @@ Ce script:
    A) Manuelle (clic sur région neutre) - À IMPLÉMENTER
    B) Grey World - À IMPLÉMENTER  
    C) Proposée par la caméra - IMPLÉMENTÉ
-   D) Contrast-stretch (ImageMagick) - À IMPLÉMENTER
 4. Convertit en espace XYZ - IMPLÉMENTÉ
 5. Sauvegarde dans ./images_intermediaires_sec3/
 
@@ -158,35 +157,6 @@ def white_balance_camera(image, camera_wb):
     return np.clip(corrected, 0, 1), multipliers
 
 
-def white_balance_contrast_stretch(input_path, output_path):
-    """
-    Appliquer le contrast-stretch avec ImageMagick.
-    
-    Commande: magick input -separate -contrast-stretch 0.5%x0.5% -combine output
-    
-    Args:
-        input_path: Chemin de l'image d'entrée
-        output_path: Chemin de l'image de sortie
-    
-    Returns:
-        success: True si la commande a réussi
-        output_image: Image résultante ou None
-    
-    TODO: Implémenter l'appel à ImageMagick
-    
-    Indices:
-    1. Utiliser shutil.which('magick') ou shutil.which('convert') pour trouver ImageMagick
-    2. Utiliser subprocess.run() pour exécuter la commande
-    3. Charger l'image résultante avec PIL
-    """
-    # =========================================================================
-    # TODO: Implémenter l'appel à ImageMagick pour contrast-stretch
-    # =========================================================================
-    
-    print("    [ATTENTION] Contrast-stretch non implémenté")
-    return False, None
-
-
 # =============================================================================
 # Conversion d'Espace Colorimétrique
 # =============================================================================
@@ -238,8 +208,6 @@ def generate_report(results, output_dir):
         '<p>Mise à l\'échelle pour que toutes les moyennes égalent celle du vert. <strong>À IMPLÉMENTER</strong></p>')
     algorithms += algorithm_box('C) Proposé par la caméra',
         '<p>Multiplicateurs stockés dans les métadonnées RAW. <strong>IMPLÉMENTÉ</strong></p>')
-    algorithms += algorithm_box('D) Contrast-stretch',
-        '<p>ImageMagick: <code>-separate -contrast-stretch 0.5%x0.5% -combine</code>. <strong>À IMPLÉMENTER</strong></p>')
     algorithms += algorithm_box('Conversion XYZ',
         '<p>Camera RGB → XYZ via l\'inverse normalisée de <code>rgb_xyz_matrix</code>. <strong>IMPLÉMENTÉ</strong></p>')
     
@@ -347,10 +315,6 @@ def process_white_balance(input_dir='images_intermediaires_sec2',
             save_tiff16(wb_camera, os.path.join(output_dir, f"{basename}_camera.tiff"))
             save_jpeg(wb_camera, os.path.join(output_dir, f"{basename}_camera.jpg"))
             
-            # D) Contrast stretch (à implémenter par l'étudiant)
-            print("  [D] Contrast-stretch...")
-            # TODO: Implémenter l'appel à ImageMagick
-            
             # Conversion XYZ
             print("  Conversion vers XYZ...")
             xyz_camera = camera_rgb_to_xyz(wb_camera, rgb_xyz_matrix)
@@ -400,4 +364,3 @@ if __name__ == '__main__':
     
     args = parser.parse_args()
     process_white_balance(args.input_dir, args.metadata_dir, args.output_dir, args.suffix)
-

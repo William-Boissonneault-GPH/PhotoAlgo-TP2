@@ -5,7 +5,7 @@ TP1 Section 4: Mappage Tonal et Encodage d'Affichage
 
 Ce script:
 1. Charge les images XYZ depuis ./images_intermediaires_sec3/*_camera_xyz.tiff
-2. Applique l'ajustement de luminosité (À IMPLÉMENTER - 99e percentile)
+2. Applique l'ajustement de luminosité (À IMPLÉMENTER)
 3. Applique le mappage tonal:
    - Linéaire (implémenté)
    - Reinhard (À IMPLÉMENTER)
@@ -14,7 +14,7 @@ Ce script:
 4. Convertit XYZ vers sRGB linéaire (implémenté)
 5. Applique l'OETF sRGB (implémenté)
 6. Sauvegarde le JPEG final (implémenté)
-7. Analyse les artefacts JPEG (À IMPLÉMENTER par l'étudiant)
+7. Analyse les artefacts JPEG (À IMPLÉMENTER)
 8. Sauvegarde dans ./images_intermediaires_sec4/
 
 Usage:
@@ -422,12 +422,11 @@ def process_display_encoding(input_dir='images_intermediaires_sec3',
 
 if __name__ == '__main__':
     import argparse
-    
+
     parser = argparse.ArgumentParser(description='TP1 Section 4: Mappage Tonal et Encodage')
     parser.add_argument('--input-dir', '-i', default='images_intermediaires_sec3')
     parser.add_argument('--output-dir', '-o', default='images_intermediaires_sec4')
     parser.add_argument('--suffix', '-s', default='_camera_xyz.tiff')
-    
+
     args = parser.parse_args()
     process_display_encoding(args.input_dir, args.output_dir, args.suffix)
-
