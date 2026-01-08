@@ -132,12 +132,36 @@ def extract_metadata(raw_img):
 
     # Balance des blancs et matrices de couleur
     metadata["camera_whitebalance"] = list(raw_img.camera_whitebalance)
-    metadata["rgb_xyz_matrix"] = raw_img.rgb_xyz_matrix.tolist()
-
+    
+    # RGB-XYZ matrix: use standard XYZ to RGB D65 if missing or all zeros
+    # Standard XYZ to RGB D65 matrix (inverse of RGB to XYZ, for linear RGB)
+    standard_xyz_rgb = np.array([
+        [ 3.2404542, -1.5371385, -0.4985314],
+        [-0.9692660,  1.8760108,  0.0415560],
+        [ 0.0556434, -0.2040259,  1.0572252]
+    ])
     try:
-        metadata["color_matrix"] = raw_img.color_matrix.tolist()
+        rgb_xyz = raw_img.rgb_xyz_matrix
+        if rgb_xyz is not None and not np.allclose(rgb_xyz, 0):
+            metadata["rgb_xyz_matrix"] = rgb_xyz.tolist()
+        else:
+            # Use standard XYZ to RGB D65 matrix
+            metadata["rgb_xyz_matrix"] = standard_xyz_rgb.tolist()
+    except (AttributeError, ValueError):
+        # Use standard XYZ to RGB D65 matrix if attribute doesn't exist
+        metadata["rgb_xyz_matrix"] = standard_xyz_rgb.tolist()
+    
+    # Color matrix: use identity if missing or all zeros
+    try:
+        color_mat = raw_img.color_matrix
+        if color_mat is not None and not np.allclose(color_mat, 0):
+            metadata["color_matrix"] = color_mat.tolist()
+        else:
+            # Use 3x3 identity matrix
+            metadata["color_matrix"] = np.eye(3).tolist()
     except AttributeError:
-        metadata["color_matrix"] = None
+        # Use 3x3 identity matrix if attribute doesn't exist
+        metadata["color_matrix"] = np.eye(3).tolist()
 
     try:
         metadata["daylight_whitebalance"] = list(raw_img.daylight_whitebalance)
