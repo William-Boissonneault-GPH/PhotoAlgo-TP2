@@ -107,6 +107,8 @@ def linear_to_srgb(linear):
     )
     return np.clip(srgb, 0, 1)
 
+def normal_image(img):
+    return img
 
 def xyz_to_linear_srgb(xyz_image):
     """
