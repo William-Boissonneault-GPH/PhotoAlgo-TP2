@@ -38,9 +38,9 @@ create_params_finding_figure = False
 def _norm_path(p):
     return os.path.normcase(os.path.normpath(p))
 crop_roi_by_path = {
-    'sourceimages\\accentuation\\aegep_2025__20.jpg': (1604, 1039, 2594, 2177),
-    'sourceimages\\accentuation\\dsc_9683_final.jpg': (1710, 733, 3197, 2240),
-    'sourceimages\\accentuation\\dsc_0254_final_tuned.png': (1625, 1689, 2194, 3557),
+    'sourceimages\\accentuation\\aegep_2025__20.jpg': (1938, 2301, 1026, 738),
+    'sourceimages\\accentuation\\dsc_9683_final.jpg': (2783, 1387, 1081, 832),
+    'sourceimages\\accentuation\\dsc_0254_final_tuned.png': (2444, 3020, 1426, 2118),
 }
 
 
@@ -125,11 +125,11 @@ for img_path in image_paths:
         # Figure de comparaison
         print("  Création des figures de comparaison...")
         images = {"Initial": img}
-        images[f"Sharppend (sigma spatial : {sigma_spatial_choisi}), alpha : {alpha_choisi}"] = applySharpening(img, sigma_spatial_choisi, alpha_choisi)
+        images[f"Sharpened (sigma spatial : {sigma_spatial_choisi}), alpha : {alpha_choisi}"] = applySharpening(img, sigma_spatial_choisi, alpha_choisi)
 
         create_demosaic_comparison_figure(
             images,
-            os.path.join(images_a_accentuer_output_dir, f"image{i}_comparison.png"),
+            os.path.join(images_a_accentuer_output_dir, f"c_image{i}_comparison.png"),
             normal_image,
             title=f"Avant/Après Sharpening - image{i}",
         )
