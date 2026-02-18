@@ -73,7 +73,92 @@ def pile_gaussienne_laplaciennce(image_path, start, amount):
     pass
 
 
-def pile_laplacienne(image):
-    pass
+import numpy as np
+from skimage.filters import gaussian
+from skimage.transform import resize
 
-pile_gaussienne_laplaciennce(input_img, 100, 7)
+
+
+
+#################IMPLEMENTATION CHAT GPT#################
+def gaussian_pyramid(img_path, n_levels=5, sigma=1.0, downscale=2):
+    """
+    Construit une pyramide gaussienne:
+      G0 = img
+      G_{k+1} = downsample( gaussian(G_k, sigma) )
+
+    Params
+    ------
+    img : ndarray (H,W) ou (H,W,C)
+        Image d'entrée (uint8 ou float).
+    n_levels : int
+        Nombre de niveaux à retourner (incluant le niveau 0).
+    sigma : float
+        Sigma du flou gaussien appliqué avant chaque downsample.
+    downscale : int
+        Facteur de réduction (2 = diviser H et W par 2).
+
+    Returns
+    -------
+    pyr : list of ndarray
+        Liste [G0, G1, ..., G_{n_levels-1}] en float32.
+        Valeurs dans [0,1] si l'entrée était uint8, sinon conservées (clip si besoin).
+    """
+
+    img = imread(img_path)
+    if n_levels < 1:
+        raise ValueError("n_levels doit être >= 1")
+
+    # --- Convertir en float32 ---
+    img_f = img.astype(np.float32)
+    if img_f.dtype != np.float32:
+        img_f = img_f.astype(np.float32)
+
+    # Si uint8 classique, on normalise vers [0,1]
+    if img.dtype == np.uint8:
+        img_f /= 255.0
+
+    pyr = [img_f]
+
+    for _ in range(1, n_levels):
+        prev = pyr[-1]
+
+        # 1) blur
+        # channel_axis = -1 pour RGB, None pour grayscale
+        channel_axis = -1 if prev.ndim == 3 else None
+        blurred = gaussian(prev, sigma=sigma, channel_axis=channel_axis, preserve_range=True)
+
+        # 2) downsample (anti-aliasing déjà aidé par blur, mais on garde resize propre)
+        H, W = blurred.shape[:2]
+        newH = max(1, H // downscale)
+        newW = max(1, W // downscale)
+
+        if blurred.ndim == 2:
+            reduced = resize(
+                blurred, (newH, newW),
+                order=1, mode="reflect", anti_aliasing=True, preserve_range=True
+            ).astype(np.float32)
+        else:
+            C = blurred.shape[2]
+            reduced = resize(
+                blurred, (newH, newW, C),
+                order=1, mode="reflect", anti_aliasing=True, preserve_range=True
+            ).astype(np.float32)
+
+        pyr.append(reduced)
+
+    return pyr
+
+
+pyr = gaussian_pyramid(input_img,7)
+plt.figure(figsize=(15, 4))
+for i, level in enumerate(pyr):
+    plt.subplot(1, len(pyr), i+1)
+    plt.imshow(level, cmap="gray" if level.ndim == 2 else None)
+    plt.title(f"G{i}\n{level.shape[1]}x{level.shape[0]}")
+    plt.axis("off")
+plt.tight_layout()
+plt.savefig(f'{output_dir}_pyr_gaussienne.png')
+plt.show()
+
+#pile_gaussienne_laplaciennce(input_img, 100, 7)
